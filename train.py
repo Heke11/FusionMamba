@@ -80,9 +80,9 @@ def train_fusion(num=0, logger=None):
     fusionmodel.cuda()
     fusionmodel.train()
     optimizer = torch.optim.Adam(fusionmodel.parameters(), lr=lr_start)
-    train_dataset = Fusion_dataset('train',length=30000)
+    train_dataset = Fusion_dataset('train',length=30000)    ## train_dataset是一个Fusion_dataset类的实例化对象，img_vis, img_ir = train_dataset[0]后img_vis和img_ir才是tensor类型的数据，因为[]调用了__getitem__函数
     print("the training dataset is length:{}".format(train_dataset.length))
-    train_loader = DataLoader(
+    train_loader = DataLoader(    ## for vis, ir in train_loader:         print(type(vis))  # <class 'torch.Tensor'>
         dataset=train_dataset,
         batch_size=2,
         shuffle=True,
