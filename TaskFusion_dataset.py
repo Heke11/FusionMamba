@@ -17,6 +17,7 @@ def imresize(arr, size, interp='bilinear', mode=None):
     # type() 适用于任何Python对象，用于获取对象的类型信息  print(type(a)) # 输出: <class 'list'> / 输出: <class 'dict'>
     # dtype 是NumPy数组的一个属性，用于返回数组中数据元素的类型。NumPy数组中的所有元素必须属于同一数据类型，因此可以使用dtype属性。  print(c.dtype) # 输出: int32 / 输出: float64
     if np.issubdtype(ts, np.signedinteger):
+        # numpy.issubdtype(arg1, arg2)---判断啊arg1是不是arg2的子类型，返回true或false;比如np.int32是np.integer的子类型，但是float32不是float64的子类型
         percent = size / 100.0
         size = tuple((np.array(im.size) * percent).astype(int))
     elif np.issubdtype(type(size), np.floating):
