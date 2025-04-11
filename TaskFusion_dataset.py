@@ -1,3 +1,9 @@
+'''
+prepare_data_path()	给定一个文件夹路径，收集所有图像文件的完整路径（支持 .bmp .tif .jpg .png）
+imresize()	使用 PIL 对图像进行缩放（带有插值方式）
+Fusion_dataset(Dataset)	PyTorch 的自定义数据集类，核心：加载图像 → 灰度处理 → 缩放 → 归一化 → 转 tensor
+'''
+
 import os
 import torch
 from torch.utils.data.dataset import Dataset
