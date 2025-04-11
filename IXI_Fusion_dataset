@@ -73,27 +73,16 @@ class Fusion_dataset(Dataset):
     # 让自定义类的实例能像列表、字典一样通过 obj[index] 或 obj[key] 获取数据。
     def __getitem__(self, index):    ## 实例名[index]等同于实例名.__getitem__(index)
         if self.split == 'train':
-            vis_path = self.filepath_t1[index]
-            ir_path = self.filepath_dti[index]
+            t1_path = self.filepath_t1[index]
+            dti_path = self.filepath_dti[index]
 
-            image_t1 = cv2.imread(t1_path,0)    # cv1.imread(filename,读取方式(cv2.IMREAD_COLOR或1--彩色图像/cv2.IMREAD_GRAYSCALE或0--灰度图像))，返回numpy数组，数组的shape:(高度，宽度，通道数)，size是图像的像素数，size = height × width × channels
-            # if image_t1 is None:
-            #     raise ValueError(f"Failed to load image at {t1_path}")
-            # image_t1 = cv2.cvtColor(image_t1, cv2.COLOR_BGR2GRAY)
+            image_t1=np.load(t1_path)     # float32?
+            image_dti=np.load(dti_path)
 
-            image_dti = cv2.imread(dti_path,0)
-            if image_dti is None:
-                raise ValueError(f"Failed to load image at {dti_path}")
-
-            image_dti, image_t1 = self.resize(image_dti, image_t1, [256, 256], [256, 256])  
-
-
-            image_t1 = np.asarray(Image.fromarray(image_t1), dtype=np.float32) / 255.0
             image_t1 = np.expand_dims(image_t1, axis=0)    
             # np.expand_dims(数组a,axis)---在指定的axis上插入一个新维度，比如数组a(一维数组)的shape是(3,),np.expand_dims(a,axis=0)后shape变为(1,3)
             # shape(2,2)---np.expand(a,axis=1)---变为shape(2,1,2)
 
-            image_dti = np.asarray(Image.fromarray(image_dti), dtype=np.float32) / 255.0
             image_dti = np.expand_dims(image_dti, axis=0)
 
             name = self.filenames_t1[index]
@@ -104,19 +93,16 @@ class Fusion_dataset(Dataset):
         elif self.split == 'test':
             t1_path = self.filepath_t1[index]
             dti_path = self.filepath_dti[index]
-            image_t1 = cv2.imread(t1_path)
-            gray_image = cv2.cvtColor(t1_image, cv2.COLOR_BGR2GRAY)
+            image_t1 = np.load(t1_path)
             if image_t1 is None:
                 raise ValueError(f"Failed to load image at {t1_path}")
 
-            image_dti = cv2.imread(dti_path, 0)
+            image_dti = np.load(dti_path)
             if image_dti is None:
                 raise ValueError(f"Failed to load image at {dti_path}")
 
             # image_t1 = np.asarray(Image.fromarray(image_t1), dtype=np.float32).transpose((2, 0, 1)) / 255.0
-            image_t1 = np.asarray(Image.fromarray(image_t1), dtype=np.float32) / 255.0
             image_t1 = np.expand_dims(image_t1, axis=0)
-            image_dti = np.asarray(Image.fromarray(image_dti), dtype=np.float32) / 255.0
             image_dti = np.expand_dims(image_dti, axis=0)
 
             name = self.filenames_t1[index]
