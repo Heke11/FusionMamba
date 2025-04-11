@@ -88,7 +88,7 @@ class Fusion_dataset(Dataset):
             self.split = split
 
     # 让自定义类的实例能像列表、字典一样通过 obj[index] 或 obj[key] 获取数据。
-    def __getitem__(self, index):
+    def __getitem__(self, index):    ## 实例名[index]等同于实例名.__getitem__(index)
         if self.split == 'train':
             vis_path = self.filepath_vis[index]
             ir_path = self.filepath_ir[index]
