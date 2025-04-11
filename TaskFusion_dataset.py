@@ -11,21 +11,25 @@ from numpy import asarray
 def imresize(arr, size, interp='bilinear', mode=None):
     numpydata = asarray(arr)                            # np.asarray()将各种类型的输入数据转换为numpy数据类型
     im = Image.fromarray(numpydata, mode=mode)          # 三维数组a,a[0,1,2]----第0个矩阵第1行第2列            
-    # Image.fromarray()把numpy数组转换成灰度图像或RGB图像，mode='L'转换成灰度图像,mode='RGB'转换成彩色图像；
+    # Image.fromarray()把numpy数组转换成灰度图像或RGB图像，mode='L'转换成灰度图像,mode='RGB'转换成彩色图像；返回PIL图像
     # 数组中数值范围均从0到255，对于灰度图像，对应二维数组，越接近0越黑，越接近255灰度越亮；对于彩色图像，对应三位数组，0到255就是代表像素的值。
     ts = type(size)
     # type() 适用于任何Python对象，用于获取对象的类型信息  print(type(a)) # 输出: <class 'list'> / 输出: <class 'dict'>
     # dtype 是NumPy数组的一个属性，用于返回数组中数据元素的类型。NumPy数组中的所有元素必须属于同一数据类型，因此可以使用dtype属性。  print(c.dtype) # 输出: int32 / 输出: float64
+    ## size是单个数
     if np.issubdtype(ts, np.signedinteger):
         # numpy.issubdtype(arg1, arg2)---判断啊arg1是不是arg2的子类型，返回true或false;比如np.int32是np.integer的子类型，但是float32不是float64的子类型
         percent = size / 100.0
         size = tuple((np.array(im.size) * percent).astype(int))
+        # np.array()创建数组对象，tuple()将括号里的可迭代对象(列表、集合等)转换为元组类型；元组与列表相似，但是元组被创建后不能修改，元组不可变。
     elif np.issubdtype(type(size), np.floating):
         size = tuple((np.array(im.size) * size).astype(int))
+    ## size包含两个数
     else:
         size = (size[1], size[0])
-    func = {'nearest': 0, 'lanczos': 1, 'bilinear': 2, 'bicubic': 3, 'cubic': 3}
+    func = {'nearest': 0, 'lanczos': 1, 'bilinear': 2, 'bicubic': 3, 'cubic': 3}  ## 数组转换为图像时的插值方法
     imnew = im.resize(size, resample=func[interp])
+    # 使用的Pillow库中的Image.resize(目标size,resample=插值方法或方法对应的序号(Pillow库内部定义的会直接映射))
     return np.array(imnew)
 
 def prepare_data_path(dataset_path):
