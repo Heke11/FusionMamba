@@ -32,22 +32,28 @@ def imresize(arr, size, interp='bilinear', mode=None):
     # 使用的Pillow库中的Image.resize(目标size,resample=插值方法或方法对应的序号(Pillow库内部定义的会直接映射))
     return np.array(imnew)
 
+## 返回完整的文件路径(data)以及最后一层的文件名(filenames)
 def prepare_data_path(dataset_path):
-    filenames = os.listdir(dataset_path)
-    data_dir = dataset_path
-    data = glob.glob(os.path.join(data_dir, "*.bmp"))
-    data.extend(glob.glob(os.path.join(data_dir, "*.tif")))
+    filenames = os.listdir(dataset_path)    # os.listdir()返回括号里文件夹下的所有文件及文件夹的名称列表
+    data_dir = dataset_path                 
+    data = glob.glob(os.path.join(data_dir, "*.bmp"))     ## data是dataset_path目录下以.bmp结尾的所有文件名的列表
+    # os.path.join(path1,path2)会将path1和path2拼接起来，并根据操作系统添加适当的路径分隔符
+    # glob.glob()用来查找匹配括号里的指定模式的文件，返回的是包含这些文件名的列表；支持*，？，[]三个通配符，*可代表0个或多个字符，？代表1个字符，[]用于匹配指定范围内的字符，例如 [0-9] 就是匹配任何单个数字。
+    data.extend(glob.glob(os.path.join(data_dir, "*.tif")))    
     data.extend(glob.glob((os.path.join(data_dir, "*.jpg"))))
     data.extend(glob.glob((os.path.join(data_dir, "*.png"))))
-    data.sort()
+    data.sort()   # 默认先按靠前的字符的顺序排序
     filenames.sort()
     return data, filenames
 
 class Fusion_dataset(Dataset):
+    # 在Python的类定义中，__init__函数（构造函数）里可以通过self.xxx = ...的方式动态地为实例添加属性
+    # __init__()括号里的参数用来接收外部的初始化值
     def __init__(self, split, ir_path=None, vi_path=None, length=0):
         super(Fusion_dataset, self).__init__()
         assert split in ['train', 'val', 'test'], 'split must be "train"|"val"|"test"'
-        self.filepath_ir = []
+        # assert用于调试，在代码中插入断言判断条件是否为真，不是真的话抛出错误，显示信息为条件后面的语句'split must be "train"|"val"|"test"'
+        self.filepath_ir = []    
         self.filenames_ir = []
         self.filepath_vis = []
         self.filenames_vis = []
@@ -55,7 +61,8 @@ class Fusion_dataset(Dataset):
         if split == 'train':
             data_dir_vis = "/KAIST/"  # the path of your data
             data_dir_ir = "/KAIST/"  # the path of your data
-            dirs = [d for d in os.listdir(data_dir_ir) if not d.startswith('.')]
+            dirs = [d for d in os.listdir(data_dir_ir) if not d.startswith('.')]    ## 以.开头的文件是隐藏的，通常是一些配置文件，比如.bashrc，不需要修改，所以过滤掉
+            # str.startswith('str1')---检查字符串str是否以str1开头，返回True/False            
             dirs.sort()
             for dir0 in dirs:
                 subdirs = [d for d in os.listdir(os.path.join(data_dir_ir, dir0)) if not d.startswith('.')]
@@ -68,6 +75,7 @@ class Fusion_dataset(Dataset):
                         self.filepath_ir.append(filepath_ir_)
                         self.filenames_ir.append(file)
                         filepath_vis_ = filepath_ir_.replace('lwir', 'visible')
+                        # str.replace(old_substr,new_substr)用于将字符串str中的旧的子字符串替换为新的子字符串
                         self.filepath_vis.append(filepath_vis_)
                         self.filenames_vis.append(file)
             self.split = split
