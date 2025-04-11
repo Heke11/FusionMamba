@@ -87,13 +87,14 @@ class Fusion_dataset(Dataset):
             self.filepath_ir, self.filenames_ir = prepare_data_path(data_dir_ir)
             self.split = split
 
+    # 让自定义类的实例能像列表、字典一样通过 obj[index] 或 obj[key] 获取数据。
     def __getitem__(self, index):
         if self.split == 'train':
             vis_path = self.filepath_vis[index]
             ir_path = self.filepath_ir[index]
 
-            image_vis = cv2.imread(vis_path)
-            image_vis = cv2.cvtColor(image_vis, cv2.COLOR_BGR2GRAY)
+            image_vis = cv2.imread(vis_path)    # cv1.imread(filename,读取方式(cv2.IMREAD_COLOR或1--彩色图像/cv2.IMREAD_GRAYSCALE或0--灰度图像))，返回numpy数组，数组的shape:(高度，宽度，通道数)，size是图像的像素数，size = height × width × channels
+            image_vis = cv2.cvtColor(image_vis, cv2.COLOR_BGR2GRAY)    ## cvtColor进行颜色空间转换，BGR2GRAY将彩色转为灰色，3通道变1通道
             # if image_vis is None:
             #     raise ValueError(f"Failed to load image at {vis_path}")
             # image_vis = cv2.cvtColor(image_vis, cv2.COLOR_BGR2GRAY)
@@ -106,7 +107,9 @@ class Fusion_dataset(Dataset):
 
 
             image_vis = np.asarray(Image.fromarray(image_vis), dtype=np.float32) / 255.0
-            image_vis = np.expand_dims(image_vis, axis=0)
+            image_vis = np.expand_dims(image_vis, axis=0)    
+            # np.expand_dims(数组a,axis)---在指定的axis上插入一个新维度，比如数组a(一维数组)的shape是(3,),np.expand_dims(a,axis=0)后shape变为(1,3)
+            # shape(2,2)---np.expand(a,axis=1)---变为shape(2,1,2)
 
             image_ir = np.asarray(Image.fromarray(image_ir), dtype=np.float32) / 255.0
             image_ir = np.expand_dims(image_ir, axis=0)
