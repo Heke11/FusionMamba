@@ -20,7 +20,7 @@ from loss import Fusionloss
 import torch
 from torch.utils.data import DataLoader
 import warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')    # 程序运行时不显示警告
 
 def parse_args():
     parse = argparse.ArgumentParser()
