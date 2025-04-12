@@ -71,6 +71,7 @@ class Fusion_dataset(Dataset):
             self.split = split
 
     # 让自定义类的实例能像列表、字典一样通过 obj[index] 或 obj[key] 获取数据。
+    ## 当dataset应用dataloader后，for dti,ti in dataloader时返回的是经过__getitem__函数后的结果
     def __getitem__(self, index):    ## 实例名[index]等同于实例名.__getitem__(index)
         if self.split == 'train':
             t1_path = self.filepath_t1[index]
@@ -113,8 +114,3 @@ class Fusion_dataset(Dataset):
 
     def __len__(self):
         return self.length
-
-    def resize(self, data, data2, crop_size_img, crop_size_label):
-        data = imresize(data, crop_size_img, interp='bicubic')
-        data2 = imresize(data2, crop_size_label, interp='bicubic')
-        return data, data2
