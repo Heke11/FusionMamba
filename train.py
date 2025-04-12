@@ -23,22 +23,33 @@ import warnings
 warnings.filterwarnings('ignore')    # 程序运行时不显示警告
 
 def parse_args():
+    # argparse可以帮助开发者轻松地编写用户友好的命令行接口。该模块的核心功能是围绕argparse.ArgumentParser实例构建的，
     parse = argparse.ArgumentParser()
     return parse.parse_args()
 
+## RGB2YCrCb和YCrCb2RGB是用来进行颜色空间的转换，RGB对应R,G,B三通道，YCrCb对应Y,Cr,Cb三通道
 def RGB2YCrCb(input_im):
-    im_flat = input_im.transpose(1, 3).transpose(
-        1, 2).reshape(-1, 3)  # (nhw,c)
-    R = im_flat[:, 0]
+    im_flat = input_im.transpose(1, 3).transpose(    # transpose(a,b)---交换a,b两个维度，从0维度开始
+        1, 2).reshape(-1, 3)  # (nhw,c)    # -1自动推断改维度的大小
+    ## reshape之前是(Batch_size,height,width,cannel),cannel=3时，-1处刚好是batch_size*height*width,不是3的会报错，无法整除算不出-1处的值
+    R = im_flat[:, 0]    # Opencv中用cv2.imread()通常是BGR，Matplotlib的imshow是RGB，Pytorch也通常是RGB
     G = im_flat[:, 1]
     B = im_flat[:, 2]
-    Y = 0.299 * R + 0.587 * G + 0.114 * B
+    Y = 0.299 * R + 0.587 * G + 0.114 * B    ## 计算Y,Cr,Cb通道
     Cr = (R - Y) * 0.713 + 0.5
     Cb = (B - Y) * 0.564 + 0.5
-    Y = torch.unsqueeze(Y, 1)
+    Y = torch.unsqueeze(Y, 1)    # torch.unsqueeze(input, dim)---用于在指定的维度上插入一个大小为1的新维度,squeeze:挤压,unsqueeze:扩展
+    # 原始张量： tensor([[1, 2, 3], [4, 5, 6]])
+    # 原始张量形状： torch.Size([2, 3])
+    # 在0维度上插入新维度后的张量： tensor([[[1, 2, 3], [4, 5, 6]]])
+    # 在0维度上插入新维度后的张量形状： torch.Size([1, 2, 3])
+    # 在1维度上插入新维度后的张量： tensor([[[1, 2, 3]], [[4, 5, 6]]])
+    # 在1维度上插入新维度后的张量形状： torch.Size([2, 1, 3])
+    # 在2维度上插入新维度后的张量： tensor([[[1], [2], [3]], [[4], [5], [6]]])
+    # 在2维度上插入新维度后的张量形状： torch.Size([2, 3, 1])
     Cr = torch.unsqueeze(Cr, 1)
     Cb = torch.unsqueeze(Cb, 1)
-    temp = torch.cat((Y, Cr, Cb), dim=1).cuda()
+    temp = torch.cat((Y, Cr, Cb), dim=1).cuda()    ## Y,Cr,Cb原本是[batch_size*h*w,1]沿dim=1拼接后变为[batch_size*h*w,3]
     out = (
         temp.reshape(
             list(input_im.size())[0],
